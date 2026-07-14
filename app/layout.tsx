@@ -23,12 +23,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Foliage — AI Apple Leaf Disease Detection",
+  title: "PlantGuard — AI Apple Leaf Disease Detection",
   description:
     "An interactive showcase of a ResNet-50 & ConvNeXt research pipeline for apple leaf disease classification. Upload a leaf photo and run the real model, live, in your browser.",
-  metadataBase: new URL("https://example.com"),
+  metadataBase: new URL("https://plantdisease-nine.vercel.app"),
   openGraph: {
-    title: "Foliage — AI Apple Leaf Disease Detection",
+    title: "PlantGuard — AI Apple Leaf Disease Detection",
     description:
       "Run a real research-grade CNN on your own apple leaf photos, entirely client-side.",
     type: "website",
