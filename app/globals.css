@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-canopy-950 text-parchment-100;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(79, 143, 101, 0.18), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(201, 106, 53, 0.08), transparent);
+}
+
+::selection {
+  background: rgba(201, 106, 53, 0.35);
+  color: #fdfbf3;
+}
+
+/* subtle film-grain overlay used on dark sections */
+.grain-overlay {
+  position: relative;
+}
+.grain-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: theme("backgroundImage.grain");
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.section-shell {
+  @apply mx-auto w-full max-w-6xl px-6 sm:px-8 lg:px-10;
+}
+
+/* thin scrollbar for confusion matrix / code panels */
+.thin-scroll::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(127, 184, 150, 0.35);
+  border-radius: 999px;
+}
