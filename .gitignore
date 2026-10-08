@@ -32,3 +32,6 @@ model-convert-venv/
 verify-venv/
 *.pyc
 .env*
+
+# iOS build output
+ios/build/
