@@ -6,6 +6,7 @@ import SwiftUI
 ///   -screen <name>        orchard | seasons | community | history | database | treatments | library |
 ///                         forecast | modelLab | report | settings | tree:<CODE> | disease:<raw> | scan
 ///   -scanImage <file>     open the scanner on <file> from the app's Documents folder
+///   -classifyAll          classify every image in Documents and write classify-results.txt
 enum DebugLaunch {
     private static let args = ProcessInfo.processInfo.arguments
 
@@ -22,6 +23,24 @@ enum DebugLaunch {
               let data = try? Data(contentsOf: docs.appendingPathComponent(name))
         else { return nil }
         return UIImage(data: data)
+    }
+
+    /// `-classifyAll`: runs every image in Documents through the same path as the scanner and
+    /// writes `classify-results.txt` next to them, so on-device output can be diffed against Keras/Core ML.
+    static func classifyAllIfRequested() async {
+        guard args.contains("-classifyAll"),
+              let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+              let files = try? FileManager.default.contentsOfDirectory(atPath: docs.path)
+        else { return }
+        var lines: [String] = []
+        for name in files.sorted() where name.hasSuffix(".jpg") || name.hasSuffix(".png") {
+            guard let data = try? Data(contentsOf: docs.appendingPathComponent(name)),
+                  let cg = UIImage(data: data)?.normalized().cgImage,
+                  let c = try? await LeafClassifier.shared.classify(cg)
+            else { lines.append("\(name)\tERROR"); continue }
+            lines.append("\(name)\t\(c.top.rawValue)\t\(String(format: "%.1f", c.confidence * 100))")
+        }
+        try? lines.joined(separator: "\n").write(to: docs.appendingPathComponent("classify-results.txt"), atomically: true, encoding: .utf8)
     }
 
     @MainActor

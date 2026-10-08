@@ -35,3 +35,6 @@ verify-venv/
 
 # iOS build output
 ios/build/
+
+# Sample leaf photos for simulator testing (third-party dataset)
+ios/SampleLeaves/

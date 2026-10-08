@@ -26,11 +26,11 @@ struct ScanFlowView: View {
     @State private var treeCode: String?
     @State private var notes = ""
     @State private var savedScanID: UUID?
+    @State private var resultScrolled = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                AppBackground(accent: classification?.top.color ?? Theme.rust)
                 switch stage {
                 case .choose: chooser.transition(.opacity)
                 case .analyzing: AnalyzingView(image: image).transition(.opacity)
@@ -38,6 +38,8 @@ struct ScanFlowView: View {
                 case .failed(let message): failure(message)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(AppBackground(accent: classification?.top.color ?? Theme.rust))
             .animation(.spring(response: 0.5, dampingFraction: 0.86), value: stage)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -51,7 +53,9 @@ struct ScanFlowView: View {
                         .font(.system(size: 16, weight: .semibold)).foregroundStyle(Theme.textPrimary)
                 }
             }
-            .toolbarBackground(.hidden, for: .navigationBar)
+            // The bar can't detect the scroll view through the stage switch, so frost it explicitly
+            // once results scroll under the title.
+            .toolbarBackground(resultScrolled && (stage == .result || stage == .saved) ? .visible : .hidden, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .appRoutes()
         }
@@ -173,6 +177,9 @@ struct ScanFlowView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 30)
             }
+            .onScrollGeometryChange(for: Bool.self) { $0.contentOffset.y + $0.contentInsets.top > 8 } action: { _, scrolled in
+                resultScrolled = scrolled
+            }
         }
     }
 
@@ -230,7 +237,8 @@ struct ScanFlowView: View {
 
     private var treeSubtitle: String {
         guard let tree = trees.first(where: { $0.code == treeCode }) else { return "" }
-        return "\(tree.block?.name ?? "") · \(tree.variety) · \(tree.scans.count) earlier scans"
+        let earlier = tree.scans.filter { $0.id != savedScanID }.count
+        return "\(tree.block?.name ?? "") · \(tree.variety) · \(earlier) earlier scan\(earlier == 1 ? "" : "s")"
     }
 
     @ViewBuilder

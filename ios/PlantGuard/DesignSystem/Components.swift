@@ -287,7 +287,6 @@ extension View {
     func screenBackground() -> some View {
         background(AppBackground())
             .scrollContentBackground(.hidden)
-            .toolbarBackground(.hidden, for: .navigationBar)
     }
 }
 

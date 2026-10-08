@@ -27,6 +27,9 @@ struct RootView: View {
             if DebugLaunch.seedDemo && orchards.isEmpty { prepare(withHistory: true) }
             #endif
             await LeafClassifier.shared.warmUp()
+            #if DEBUG
+            await DebugLaunch.classifyAllIfRequested()
+            #endif
         }
     }
 
