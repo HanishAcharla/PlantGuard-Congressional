@@ -44,7 +44,7 @@ struct ModelLabView: View {
                     }
                 }
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading, spacing: 12) {
-                    spec("Training images", "17,826")
+                    spec("Dataset images", "17,826")
                     spec("Classes", "6")
                     spec("Input", "224 × 224 photo")
                     spec("Format", "Core ML · FP16")

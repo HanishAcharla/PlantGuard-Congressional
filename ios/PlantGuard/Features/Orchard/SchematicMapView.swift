@@ -80,6 +80,15 @@ struct SchematicMapView: View {
         }
     }
 
+    /// The first candidate that fits in `width`, or nil when none does.
+    private func fitting(_ candidates: [Text], font: Font, color: Color, width: CGFloat, in ctx: GraphicsContext) -> GraphicsContext.ResolvedText? {
+        for text in candidates {
+            let resolved = ctx.resolve(text.font(font).foregroundColor(color))
+            if resolved.measure(in: CGSize(width: CGFloat.infinity, height: CGFloat.infinity)).width <= width { return resolved }
+        }
+        return nil
+    }
+
     private func draw(_ ctx: inout GraphicsContext, _ f: Frame) {
         let k = f.scale
 
@@ -102,9 +111,13 @@ struct SchematicMapView: View {
             y += 3.2
             stagger.toggle()
         }
-        let wbLabel = f.point(DemoSeeder.windbreakX + 1.5, bottom - 2.5)
-        ctx.draw(Text("Cedar windbreak").font(.system(size: 10, weight: .semibold)).foregroundColor(Theme.sage.opacity(0.75)),
-                 at: wbLabel, anchor: .topTrailing)
+        // Label runs up the outside of the windbreak, clear of the block captions.
+        let coneEdge = f.point(DemoSeeder.windbreakX + 1.1, (top + bottom) / 2)
+        var labelCtx = ctx
+        labelCtx.translateBy(x: coneEdge.x + max(2, 1.05 * k) + 9, y: coneEdge.y)
+        labelCtx.rotate(by: .degrees(-90))
+        labelCtx.draw(Text("Cedar windbreak").font(.system(size: 10, weight: .semibold)).foregroundColor(Theme.sage.opacity(0.75)),
+                      at: .zero, anchor: .center)
 
         // Blocks.
         for block in orchard.blocks.sorted(by: { $0.letter < $1.letter }) {
@@ -123,10 +136,14 @@ struct SchematicMapView: View {
                 line.addLine(to: f.point(x, block.originY + block.length - 0.4))
                 ctx.stroke(line, with: .color(Color(hex: 0x2C5A3C).opacity(0.7)), style: StrokeStyle(lineWidth: max(1, k * 1.6), lineCap: .round))
             }
-            ctx.draw(Text("\(block.letter)  \(block.name)").font(.system(size: 11, weight: .bold)).foregroundColor(Theme.parchment.opacity(0.75)),
-                     at: CGPoint(x: rect.minX + 6, y: rect.minY - 4), anchor: .bottomLeading)
-            ctx.draw(Text(verbatim: "\(block.variety) · planted \(block.plantedYear)").font(.system(size: 9)).foregroundColor(Theme.parchment.opacity(0.4)),
-                     at: CGPoint(x: rect.minX + 6, y: rect.maxY + 4), anchor: .topLeading)
+            // Captions shorten when zoomed out so neighbouring blocks' labels never collide.
+            let room = rect.width - 6
+            let name = fitting([Text("\(block.letter)  \(block.name)"), Text(block.letter)],
+                               font: .system(size: 11, weight: .bold), color: Theme.parchment.opacity(0.75), width: room, in: ctx)
+            if let name { ctx.draw(name, at: CGPoint(x: rect.minX + 6, y: rect.minY - 4), anchor: .bottomLeading) }
+            let caption = fitting([Text(verbatim: "\(block.variety) · planted \(block.plantedYear)"), Text(block.variety)],
+                                  font: .system(size: 9), color: Theme.parchment.opacity(0.4), width: room, in: ctx)
+            if let caption { ctx.draw(caption, at: CGPoint(x: rect.minX + 6, y: rect.maxY + 4), anchor: .topLeading) }
         }
 
         // Inspection route.

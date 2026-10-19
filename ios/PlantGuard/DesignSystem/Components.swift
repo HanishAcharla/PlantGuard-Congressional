@@ -284,6 +284,23 @@ extension View {
         safeAreaInset(edge: .bottom) { Color.clear.frame(height: 86) }
     }
 
+    /// A fade behind the status bar for screens that hide the navigation bar, so scrolled
+    /// content never runs under the clock.
+    func statusBarScrim() -> some View {
+        // A zero-height inset at the top of the safe area: its background fills the status bar
+        // region exactly, and a short gradient hangs below it so content fades rather than cuts.
+        safeAreaInset(edge: .top, spacing: 0) {
+            Color.clear
+                .frame(height: 0)
+                .background(Theme.canopy950.opacity(0.96))
+                .overlay(alignment: .top) {
+                    LinearGradient(colors: [Theme.canopy950.opacity(0.96), Theme.canopy950.opacity(0)], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 22)
+                        .allowsHitTesting(false)
+                }
+        }
+    }
+
     func screenBackground() -> some View {
         background(AppBackground())
             .scrollContentBackground(.hidden)

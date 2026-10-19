@@ -42,6 +42,7 @@ struct SeasonsView: View {
         .tabBarSafeArea()
         .screenBackground()
         .toolbar(.hidden, for: .navigationBar)
+        .statusBarScrim()
     }
 
     private func seasonPicker(_ analytics: OrchardAnalytics, focus: Season) -> some View {

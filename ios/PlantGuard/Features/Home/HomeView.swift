@@ -31,6 +31,7 @@ struct HomeView: View {
         .tabBarSafeArea()
         .screenBackground()
         .toolbar(.hidden, for: .navigationBar)
+        .statusBarScrim()
         .sheet(isPresented: $showAddTreatment) { AddTreatmentView() }
     }
 
