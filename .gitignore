@@ -39,6 +39,5 @@ ios/build/
 # Sample leaf photos for simulator testing (third-party dataset)
 ios/SampleLeaves/
 
-# App Challenge video renders and raw recordings (large)
-cac-video/*.mp4
-cac-video/raw/
+# App Challenge video materials (kept locally, not in the repo)
+cac-video/
